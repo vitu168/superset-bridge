@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.2.0
 
 - Introduced `SupersetBridgeConfig` — a JSON-serialisable config object that
   replaces individual named parameters across all APIs.
