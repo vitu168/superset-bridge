@@ -3,7 +3,7 @@ description: >
   A Flutter package that embeds Apache Superset dashboards inside a WebView
   with automatic dark/light theme support. Applies a CSS filter technique
   to work around cross-origin iframe restrictions.
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/vitu168/superset-bridge
 repository: https://github.com/vitu168/superset-bridge.git
 issue_tracker: https://github.com/vitu168/superset-bridge/issues

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'superset_bridge_config.dart';
 
 /// Generates the self-contained HTML string for embedding a Superset dashboard.
 ///
@@ -26,25 +27,20 @@ import 'dart:convert';
 /// [SupersetBridgeController.reload] with a freshly generated HTML string.
 class SupersetBridgeHtmlContent {
   SupersetBridgeHtmlContent._();
-  static String generate({
-    required String dashboardId,
-    required String domain,
-    String theme = 'light',
-    List<int>? siteIds,
-    bool hideTitle = true,
-    bool filtersExpanded = false,
-    bool urlParamsRefresh = true,
-  }) {
-    final baseUrlJs          = jsonEncode(domain);
-    final dashboardIdJs      = jsonEncode(dashboardId);
-    final themeJs            = jsonEncode(theme);
-    final siteIdsJs          = (siteIds != null && siteIds.isNotEmpty)
-        ? jsonEncode(siteIds)
+  static String generate(SupersetBridgeConfig config) {
+    final baseUrlJs          = jsonEncode(config.domain);
+    final dashboardIdJs      = jsonEncode(config.dashboardId);
+    final themeJs            = jsonEncode(config.theme);
+    final siteIdsJs          = (config.siteIds != null && config.siteIds!.isNotEmpty)
+        ? jsonEncode(config.siteIds)
         : 'null';
-    final hideTitleJs        = jsonEncode(hideTitle);
-    final filtersExpandedJs  = jsonEncode(filtersExpanded);
-    final urlParamsRefreshJs = jsonEncode(urlParamsRefresh);
-    final bodyClass          = theme == 'dark' ? 'dark' : 'light';
+    final hideTitleJs        = jsonEncode(config.hideTitle);
+    final filtersExpandedJs  = jsonEncode(config.filtersExpanded);
+    final urlParamsRefreshJs = jsonEncode(config.urlParamsRefresh);
+    final extraUrlParamsJs   = config.extraUrlParams.isNotEmpty
+        ? jsonEncode(config.extraUrlParams)
+        : 'null';
+    final bodyClass          = config.theme == 'dark' ? 'dark' : 'light';
 
     return '''
 <!DOCTYPE html>
@@ -95,6 +91,7 @@ class SupersetBridgeHtmlContent {
     var _sbHideTitle        = $hideTitleJs;
     var _sbFiltersExpanded  = $filtersExpandedJs;
     var _sbUrlParamsRefresh = $urlParamsRefreshJs;
+    var _sbExtraUrlParams   = $extraUrlParamsJs;
     var _sbDashboard        = null;
 
     async function _sbGetToken() {
@@ -110,6 +107,10 @@ class SupersetBridgeHtmlContent {
       if (_sbUrlParamsRefresh) urlParams.refresh = true;
       urlParams.theme = _sbTheme;
       if (_sbSiteIds && _sbSiteIds.length > 0) urlParams.siteId = _sbSiteIds;
+      // Merge project-specific extra params from SupersetBridgeConfig.extraUrlParams
+      if (_sbExtraUrlParams && typeof _sbExtraUrlParams === 'object') {
+        Object.assign(urlParams, _sbExtraUrlParams);
+      }
 
       _sbDashboard = await supersetEmbeddedSdk.embedDashboard({
         id: _sbUUID,

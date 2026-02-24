@@ -5,7 +5,7 @@
   "packages": [
     {
       "name": "superset_bridge",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "dependencies": [
         "flutter",
         "flutter_inappwebview"

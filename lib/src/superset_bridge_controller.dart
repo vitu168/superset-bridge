@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'superset_bridge_config.dart';
 
 /// Controller for the Superset Bridge Library.
 ///
@@ -25,35 +26,13 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 /// ```
 class SupersetBridgeController {
   InAppWebViewController? _controller;
-
-  /// `true` once [attach] has been called with a valid controller.
   bool get isReady => _controller != null;
-
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
-
-  /// Attach the underlying WebView controller.
-  /// Call this inside `onWebViewCreated`.
   void attach(InAppWebViewController controller) {
     _controller = controller;
   }
-
-  /// Detach the controller and free resources.
   void dispose() {
     _controller = null;
   }
-
-  // ── Public API ────────────────────────────────────────────────────────────
-
-  /// Reload the WebView with entirely new [htmlContent].
-  ///
-  /// This is the primary way to apply a theme or language change:
-  /// 1. Call [SupersetBridgeHtmlContent.generate] with the new settings.
-  /// 2. Pass the result here.
-  ///
-  /// `loadData()` is a navigation action — it always succeeds regardless of
-  /// whether the WebView is currently the foreground surface, unlike
-  /// `evaluateJavascript` which may be silently dropped when the WebView
-  /// is obscured.
   Future<void> reload(String htmlContent) async {
     if (_controller == null) return;
     await _controller!.loadData(data: htmlContent);
@@ -73,51 +52,34 @@ class SupersetBridgeController {
 
   // ── Optional advanced entry-points ───────────────────────────────────────
 
-  /// Embed the dashboard via the `window.SupersetBridge.initWithTokenFetch`
-  /// JS function — only useful when the HTML was loaded **without** auto-init
-  /// (i.e. the HTML was generated without baking in the call).
-  Future<void> initWithTokenFetch({
-    required String uuid,
-    required String domain,
-    required String theme,
-    List<int>? siteIds,
-    bool hideTitle = true,
-    bool filtersExpanded = false,
-    bool urlParamsRefresh = true,
-  }) async {
+  /// Embed the dashboard via `window.SupersetBridge.initWithTokenFetch`.
+  /// All embed parameters are taken from [config].
+  Future<void> initWithTokenFetch(SupersetBridgeConfig config) async {
     if (_controller == null) return;
-    final siteIdsJs = _toJsSiteIds(siteIds);
+    final siteIdsJs = _toJsSiteIds(config.siteIds);
     await _eval('''
       SupersetBridge.initWithTokenFetch(
-        ${_jsString(uuid)}, ${_jsString(domain)}, ${_jsString(theme)},
-        $siteIdsJs,
-        ${hideTitle ? 'true' : 'false'},
-        ${filtersExpanded ? 'true' : 'false'},
-        ${urlParamsRefresh ? 'true' : 'false'}
+        ${_jsString(config.dashboardId)}, ${_jsString(config.domain)},
+        ${_jsString(config.theme)}, $siteIdsJs,
+        ${config.hideTitle ? 'true' : 'false'},
+        ${config.filtersExpanded ? 'true' : 'false'},
+        ${config.urlParamsRefresh ? 'true' : 'false'}
       );
     ''');
   }
 
   /// Embed the dashboard with a **pre-fetched [token]** supplied by the caller.
-  Future<void> init({
-    required String uuid,
-    required String domain,
-    required String token,
-    required String theme,
-    List<int>? siteIds,
-    bool hideTitle = true,
-    bool filtersExpanded = false,
-    bool urlParamsRefresh = true,
-  }) async {
+  /// All other embed parameters are taken from [config].
+  Future<void> init(SupersetBridgeConfig config, {required String token}) async {
     if (_controller == null) return;
-    final siteIdsJs = _toJsSiteIds(siteIds);
+    final siteIdsJs = _toJsSiteIds(config.siteIds);
     await _eval('''
       SupersetBridge.init(
-        ${_jsString(uuid)}, ${_jsString(domain)}, ${_jsString(token)},
-        ${_jsString(theme)}, $siteIdsJs,
-        ${hideTitle ? 'true' : 'false'},
-        ${filtersExpanded ? 'true' : 'false'},
-        ${urlParamsRefresh ? 'true' : 'false'}
+        ${_jsString(config.dashboardId)}, ${_jsString(config.domain)},
+        ${_jsString(token)}, ${_jsString(config.theme)}, $siteIdsJs,
+        ${config.hideTitle ? 'true' : 'false'},
+        ${config.filtersExpanded ? 'true' : 'false'},
+        ${config.urlParamsRefresh ? 'true' : 'false'}
       );
     ''');
   }
