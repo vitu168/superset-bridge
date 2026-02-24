@@ -4,6 +4,10 @@ description: >
   with automatic dark/light theme support. Applies a CSS filter technique
   to work around cross-origin iframe restrictions.
 version: 1.0.0
+homepage: https://github.com/vitu168/superset-bridge
+repository: https://github.com/vitu168/superset-bridge.git
+issue_tracker: https://github.com/vitu168/superset-bridge/issues
+license: MIT
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
