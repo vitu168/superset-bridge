@@ -128,7 +128,6 @@ class SupersetBridgeController {
     try {
       return await _controller!.evaluateJavascript(source: source);
     } catch (e) {
-      // ignore: avoid_print
       print('[SupersetBridgeController] JS eval error: $e');
       return null;
     }

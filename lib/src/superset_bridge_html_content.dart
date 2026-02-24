@@ -26,17 +26,6 @@ import 'dart:convert';
 /// [SupersetBridgeController.reload] with a freshly generated HTML string.
 class SupersetBridgeHtmlContent {
   SupersetBridgeHtmlContent._();
-
-  /// Synchronously generate the self-contained HTML string.
-  ///
-  /// **Parameters**
-  /// - [dashboardId]     — Superset Dashboard UUID.
-  /// - [domain]          — Superset base URL, no trailing slash.
-  /// - [theme]           — `'dark'` or `'light'` (default `'light'`).
-  /// - [siteIds]         — Optional list of site IDs passed as `urlParams.siteId`.
-  /// - [hideTitle]       — Hide the Superset dashboard title bar.
-  /// - [filtersExpanded] — Start with the filters panel expanded.
-  /// - [urlParamsRefresh]— Pass `refresh=true` in the embed URL params.
   static String generate({
     required String dashboardId,
     required String domain,
