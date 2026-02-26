@@ -11,7 +11,8 @@ import 'dart:convert';
 ///   dashboardId: 'my-uuid',
 ///   domain: 'https://superset.example.com',
 ///   theme: 'dark',
-///   extraUrlParams: {'lang': 'km', 'env': 'prod'},
+///   languageCode: 'km',          // new first‑class field
+///   extraUrlParams: {'env': 'prod'},
 /// );
 ///
 /// // From JSON (e.g. remote config)
@@ -29,6 +30,7 @@ class SupersetBridgeConfig {
     required this.dashboardId,
     required this.domain,
     this.theme = 'light',
+    this.languageCode,
     this.siteIds,
     this.hideTitle = true,
     this.filtersExpanded = false,
@@ -44,6 +46,13 @@ class SupersetBridgeConfig {
 
   /// `'dark'` or `'light'`.  Defaults to `'light'`.
   final String theme;
+
+  /// Optional language code that will be added to the Superset URL params as
+  /// `lang`.  Examples: `'en'`, `'fr'`, `'km'`.
+  ///
+  /// This is separate from [extraUrlParams] so language can be treated as a
+  /// first-class property in the configuration object.
+  final String? languageCode;
 
   /// Optional list of site IDs passed as `urlParams.siteId`.
   final List<int>? siteIds;
@@ -75,6 +84,7 @@ class SupersetBridgeConfig {
       dashboardId: json['dashboardId'] as String? ?? '',
       domain: json['domain'] as String? ?? '',
       theme: json['theme'] as String? ?? 'light',
+      languageCode: json['languageCode'] as String?,
       siteIds: (json['siteIds'] as List<dynamic>?)
           ?.map((e) => e as int)
           .toList(),
@@ -93,6 +103,7 @@ class SupersetBridgeConfig {
         'dashboardId': dashboardId,
         'domain': domain,
         'theme': theme,
+        if (languageCode != null) 'languageCode': languageCode,
         if (siteIds != null && siteIds!.isNotEmpty) 'siteIds': siteIds,
         'hideTitle': hideTitle,
         'filtersExpanded': filtersExpanded,
@@ -108,6 +119,7 @@ class SupersetBridgeConfig {
     String? dashboardId,
     String? domain,
     String? theme,
+    String? languageCode,
     List<int>? siteIds,
     bool? hideTitle,
     bool? filtersExpanded,
@@ -118,6 +130,7 @@ class SupersetBridgeConfig {
       dashboardId: dashboardId ?? this.dashboardId,
       domain: domain ?? this.domain,
       theme: theme ?? this.theme,
+      languageCode: languageCode ?? this.languageCode,
       siteIds: siteIds ?? this.siteIds,
       hideTitle: hideTitle ?? this.hideTitle,
       filtersExpanded: filtersExpanded ?? this.filtersExpanded,

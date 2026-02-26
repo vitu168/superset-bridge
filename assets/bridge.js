@@ -24,11 +24,11 @@
  *
  * ## Public entry-points
  *
- *   SupersetBridge.initWithTokenFetch(uuid, domain, theme, siteIds,
+ *   SupersetBridge.initWithTokenFetch(uuid, domain, theme, languageCode, siteIds,
  *                                     hideTitle, filtersExpanded, urlParamsRefresh)
  *     → fetches guest token from <domain>/guest-token?dashboard_id=<uuid>
  *
- *   SupersetBridge.init(uuid, domain, token, theme, siteIds,
+ *   SupersetBridge.init(uuid, domain, token, theme, languageCode, siteIds,
  *                       hideTitle, filtersExpanded, urlParamsRefresh)
  *     → token supplied directly by the caller
  *
@@ -52,12 +52,12 @@ window.SupersetBridge = {
   // ── Public API ────────────────────────────────────────────────────────────
 
   initWithTokenFetch: async function (
-    uuid, domain, theme,
+    uuid, domain, theme, languageCode,
     siteIds, hideTitle, filtersExpanded, urlParamsRefresh
   ) {
     try {
       const token = await this._fetchToken(domain, uuid);
-      await this._embed(uuid, domain, token, theme, siteIds, hideTitle, filtersExpanded, urlParamsRefresh);
+      await this._embed(uuid, domain, token, theme, languageCode, siteIds, hideTitle, filtersExpanded, urlParamsRefresh);
     } catch (e) {
       console.error('[SupersetBridge] ❌ initWithTokenFetch failed:', e);
       this._showError('Failed to load dashboard: ' + e.message);
@@ -65,11 +65,11 @@ window.SupersetBridge = {
   },
 
   init: async function (
-    uuid, domain, token, theme,
+    uuid, domain, token, theme, languageCode,
     siteIds, hideTitle, filtersExpanded, urlParamsRefresh
   ) {
     try {
-      await this._embed(uuid, domain, token, theme, siteIds, hideTitle, filtersExpanded, urlParamsRefresh);
+      await this._embed(uuid, domain, token, theme, languageCode, siteIds, hideTitle, filtersExpanded, urlParamsRefresh);
     } catch (e) {
       console.error('[SupersetBridge] ❌ init failed:', e);
       this._showError('Failed to load dashboard: ' + e.message);
@@ -91,7 +91,7 @@ window.SupersetBridge = {
   // ── Private ───────────────────────────────────────────────────────────────
 
   _embed: async function (
-    uuid, domain, token, theme,
+    uuid, domain, token, theme, languageCode,
     siteIds, hideTitle, filtersExpanded, urlParamsRefresh
   ) {
     if (typeof supersetEmbeddedSdk === 'undefined') {
@@ -111,6 +111,9 @@ window.SupersetBridge = {
     const urlParams = {};
     if (urlParamsRefresh) urlParams.refresh = true;
     urlParams.theme = theme;
+    if (languageCode && typeof languageCode === 'string') {
+      urlParams.lang = languageCode;
+    }
     if (siteIds && Array.isArray(siteIds) && siteIds.length > 0) {
       urlParams.siteId = siteIds;
     }

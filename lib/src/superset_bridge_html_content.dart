@@ -40,6 +40,9 @@ class SupersetBridgeHtmlContent {
     final extraUrlParamsJs   = config.extraUrlParams.isNotEmpty
         ? jsonEncode(config.extraUrlParams)
         : 'null';
+    final languageCodeJs      = config.languageCode != null
+        ? jsonEncode(config.languageCode)
+        : 'null';
     final bodyClass          = config.theme == 'dark' ? 'dark' : 'light';
 
     return '''
@@ -92,6 +95,7 @@ class SupersetBridgeHtmlContent {
     var _sbFiltersExpanded  = $filtersExpandedJs;
     var _sbUrlParamsRefresh = $urlParamsRefreshJs;
     var _sbExtraUrlParams   = $extraUrlParamsJs;
+    var _sbLanguageCode     = $languageCodeJs;
     var _sbDashboard        = null;
 
     async function _sbGetToken() {
@@ -107,6 +111,9 @@ class SupersetBridgeHtmlContent {
       if (_sbUrlParamsRefresh) urlParams.refresh = true;
       urlParams.theme = _sbTheme;
       if (_sbSiteIds && _sbSiteIds.length > 0) urlParams.siteId = _sbSiteIds;
+      if (_sbLanguageCode && typeof _sbLanguageCode === 'string') {
+        urlParams.lang = _sbLanguageCode;
+      }
       // Merge project-specific extra params from SupersetBridgeConfig.extraUrlParams
       if (_sbExtraUrlParams && typeof _sbExtraUrlParams === 'object') {
         Object.assign(urlParams, _sbExtraUrlParams);

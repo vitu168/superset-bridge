@@ -21,6 +21,7 @@ import 'superset_bridge_config.dart';
 ///     dashboardId: 'uuid',
 ///     domain: 'https://superset.example.com',
 ///     theme: 'dark',
+///     languageCode: 'fr',          // pass new language
 ///   ),
 /// );
 /// ```
@@ -57,10 +58,13 @@ class SupersetBridgeController {
   Future<void> initWithTokenFetch(SupersetBridgeConfig config) async {
     if (_controller == null) return;
     final siteIdsJs = _toJsSiteIds(config.siteIds);
+    final langJs = config.languageCode != null
+        ? _jsString(config.languageCode!)
+        : 'null';
     await _eval('''
       SupersetBridge.initWithTokenFetch(
         ${_jsString(config.dashboardId)}, ${_jsString(config.domain)},
-        ${_jsString(config.theme)}, $siteIdsJs,
+        ${_jsString(config.theme)}, $langJs, $siteIdsJs,
         ${config.hideTitle ? 'true' : 'false'},
         ${config.filtersExpanded ? 'true' : 'false'},
         ${config.urlParamsRefresh ? 'true' : 'false'}
@@ -73,10 +77,13 @@ class SupersetBridgeController {
   Future<void> init(SupersetBridgeConfig config, {required String token}) async {
     if (_controller == null) return;
     final siteIdsJs = _toJsSiteIds(config.siteIds);
+    final langJs = config.languageCode != null
+        ? _jsString(config.languageCode!)
+        : 'null';
     await _eval('''
       SupersetBridge.init(
         ${_jsString(config.dashboardId)}, ${_jsString(config.domain)},
-        ${_jsString(token)}, ${_jsString(config.theme)}, $siteIdsJs,
+        ${_jsString(token)}, ${_jsString(config.theme)}, $langJs, $siteIdsJs,
         ${config.hideTitle ? 'true' : 'false'},
         ${config.filtersExpanded ? 'true' : 'false'},
         ${config.urlParamsRefresh ? 'true' : 'false'}

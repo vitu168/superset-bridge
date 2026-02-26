@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+- Added `languageCode` parameter to `SupersetBridgeConfig` and related APIs;
+  value is sent as the `lang` URL param. Provided convenience handling in
+  HTML generator, controller, and JS bridge functions.
+
 ## 1.2.0
 
 - Introduced `SupersetBridgeConfig` — a JSON-serialisable config object that

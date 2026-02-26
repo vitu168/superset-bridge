@@ -15,6 +15,9 @@ and can be added to any Flutter project that uses a WebView (currently
   JSON-serialisable configuration object.
 - Toggle dark/light mode without reloading the WebView.
 - Optional token fetch or manual token injection.
+- Specify a top‑level `languageCode` that will be sent as the
+  `lang` URL parameter (in addition to or instead of using
+  `extraUrlParams`).
 - Pass arbitrary extra URL parameters (via `SupersetBridgeConfig.extraUrlParams`)
   so each project can customise the embed request without modifying the package.
 
@@ -24,7 +27,7 @@ and can be added to any Flutter project that uses a WebView (currently
 
 ```yaml
 dependencies:
-  superset_bridge: ^1.1.0
+  superset_bridge: ^1.3.0
 ```
 
 2. **Import the package**
@@ -42,9 +45,9 @@ final config = SupersetBridgeConfig(
   dashboardId: 'your-dashboard-uuid',
   domain: 'https://superset.example.com',
   theme: 'light',
+  languageCode: 'en',         // optional first‑class language parameter
   siteIds: [1, 2],           // optional
   extraUrlParams: {
-    'lang': 'en',
     'orgId': 42,
   },
 );
@@ -75,7 +78,7 @@ await bridge.updateUI(theme: 'dark');
 
 // regenerate HTML with new config (e.g. new dashboardId or language):
 final newHtml = SupersetBridgeHtmlContent.generate(
-  config.copyWith(theme: 'dark'),
+  config.copyWith(theme: 'dark', languageCode: 'fr'),
 );
 await bridge.reload(newHtml);
 ```
