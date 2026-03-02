@@ -129,6 +129,7 @@ class SupersetBridgeHtmlContent {
           standalone: true,
           filters: { expanded: _sbFiltersExpanded },
           urlParams: urlParams,
+          languageCode: _sbLanguageCode,
         },
         iframeSandboxExtras: ['allow-top-navigation', 'allow-popups-to-escape-sandbox'],
       });

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0
+
+_ Added `languageCode` parameter to `SupersetBridgeConfig` and related APIs;
+  and change color dark mode for superset background.
+
 ## 1.3.0
 
 - Added `languageCode` parameter to `SupersetBridgeConfig` and related APIs;

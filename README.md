@@ -27,7 +27,7 @@ and can be added to any Flutter project that uses a WebView (currently
 
 ```yaml
 dependencies:
-  superset_bridge: ^1.3.0
+  superset_bridge: ^1.6.0
 ```
 
 2. **Import the package**
