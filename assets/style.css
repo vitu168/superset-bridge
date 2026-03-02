@@ -47,7 +47,8 @@ body.light #superset-mount {
  *                      started after the inversion.
  */
 body.dark {
-  background: #1e293b;
+  /* background: #1e293b; */
+  background: #64748b;
 }
 body.dark #superset-mount {
   filter: invert(1) hue-rotate(180deg);

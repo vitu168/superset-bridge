@@ -118,6 +118,7 @@ window.SupersetBridge = {
       urlParams.siteId = siteIds;
     }
 
+    // Note: here is the only place where the token is used — passed to the SDK via fetchGuestToken callback.
     try {
       this.dashboard = await supersetEmbeddedSdk.embedDashboard({
         id: uuid,
@@ -129,6 +130,7 @@ window.SupersetBridge = {
           standalone: true,
           filters: { expanded: filtersExpanded },
           urlParams: urlParams,
+          languageCode: languageCode,
         },
         iframeSandboxExtras: ['allow-top-navigation', 'allow-popups-to-escape-sandbox'],
       });
