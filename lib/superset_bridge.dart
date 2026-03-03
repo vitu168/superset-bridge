@@ -1,4 +1,4 @@
-library superset_bridge;
+library;
 
 export 'src/superset_bridge_config.dart';
 export 'src/superset_bridge_controller.dart';

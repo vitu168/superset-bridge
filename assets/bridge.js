@@ -118,7 +118,10 @@ window.SupersetBridge = {
       urlParams.siteId = siteIds;
     }
 
-    // Note: here is the only place where the token is used — passed to the SDK via fetchGuestToken callback.
+    if (hideTitle || hideTitle === 'true') {
+      urlParams.hideTitle = true;
+    }
+
     try {
       this.dashboard = await supersetEmbeddedSdk.embedDashboard({
         id: uuid,
@@ -143,7 +146,7 @@ window.SupersetBridge = {
       this._showError('Failed to embed dashboard: ' + e.message);
     }
   },
-
+   
   _showLoading: function (show) {
     const el = document.getElementById('_bridge_loading');
     if (el) el.className = show ? '' : 'hidden';
@@ -154,4 +157,21 @@ window.SupersetBridge = {
     if (el) { el.className = 'visible'; el.textContent = message; }
     this._showLoading(false);
   },
+
+  _showInfo: function (message) {
+    const el = document.getElementById('_bridge_info');
+    if (el) { el.className = 'visible'; el.textContent = message; }
+    this._showInfo(false);
+  },
+
+  _showWarning: function (message){
+    const el = document.getElementById('_bridge_warning');
+    if (el ) {
+      el.className = 'visible';
+      el.textContent = message;
+    }
+    else {
+      console.warn('[SupersetBridge] ⚠️ ' + message);
+    }
+  }
 };
