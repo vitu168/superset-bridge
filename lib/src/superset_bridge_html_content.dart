@@ -53,6 +53,33 @@ class SupersetBridgeHtmlContent {
   <meta name="viewport" content="width=device-width, initial-scale=1.0,
         maximum-scale=1.0, user-scalable=no" />
   <title>Superset</title>
+  <!--
+    Fetch interceptor: the Superset embedded SDK internally calls /api/v1/me/roles/
+    which always returns 403 for guest tokens.  We patch window.fetch so that
+    every 403 on that path is silently replaced with an empty-roles 200 response,
+    preventing SDK initialisation errors without touching the Superset server.
+  -->
+  <script>
+    (function () {
+      var _origFetch = window.fetch;
+      window.fetch = function (input, init) {
+        var url = typeof input === 'string' ? input
+                : (input instanceof Request ? input.url : String(input));
+        if (url.indexOf('/api/v1/me/roles') !== -1) {
+          return _origFetch.call(this, input, init).then(function (resp) {
+            if (resp.status === 403) {
+              return new Response(
+                JSON.stringify({ count: 0, result: [] }),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+              );
+            }
+            return resp;
+          });
+        }
+        return _origFetch.apply(this, arguments);
+      };
+    })();
+  </script>
   <script src="https://unpkg.com/@superset-ui/embedded-sdk"></script>
   <style>
     /* ── Base layout ───────────────────────────────────── */

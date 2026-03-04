@@ -36,6 +36,26 @@
  *     → 'dark' | 'light' — called from Flutter via evaluateJavascript()
  */
 
+(function () {
+  var _origFetch = window.fetch;
+  window.fetch = function (input, init) {
+    var url = typeof input === 'string' ? input
+            : (input instanceof Request ? input.url : String(input));
+    if (url.indexOf('/api/v1/me/roles') !== -1) {
+      return _origFetch.call(this, input, init).then(function (resp) {
+        if (resp.status === 403) {
+          return new Response(
+            JSON.stringify({ count: 0, result: [] }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        return resp;
+      });
+    }
+    return _origFetch.apply(this, arguments);
+  };
+})();
+
 window.SupersetBridge = {
   dashboard: null,
 
