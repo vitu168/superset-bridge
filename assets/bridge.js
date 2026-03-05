@@ -7,20 +7,11 @@
  *
  * ## How dark mode works
  *
- *   Superset embeds via a cross-origin <iframe>. Injecting CSS into the
- *   iframe is blocked by the browser (SecurityError). setThemeConfig() does
- *   not exist on the embedDashboard() result.
+ *   The actual theme ('dark' or 'light') is passed to Superset via
+ *   urlParams.theme in the embedDashboard() call. Superset natively
+ *   renders the correct theme inside its iframe.
  *
- *   Instead, a CSS visual filter is applied to the MOUNT DIV in the parent
- *   document — no cross-origin access needed because we own the parent HTML:
- *
- *     body.dark #superset-mount { filter: invert(1) hue-rotate(180deg); }
- *
- *   invert(1) flips brightness (white↔black).
- *   hue-rotate(180deg) spins hues so colours land roughly where they started.
- *   Net effect: clean visual dark mode for charts and tables.
- *
- *   updateUI() toggles the body class — instant, no reload, no flash.
+ *   updateUI() toggles the body class for background styling only.
  *
  * ## Public entry-points
  *
@@ -77,8 +68,8 @@ window.SupersetBridge = {
   },
 
   /**
-   * Toggle dark/light mode by switching the body CSS class.
-   * No cross-origin access — operates on the parent document only.
+   * Toggle dark/light body background class.
+   * Superset's own theme is set at embed time via urlParams.theme.
    * @param {string} theme - 'dark' | 'light'
    */
   updateUI: function (theme) {
@@ -110,6 +101,7 @@ window.SupersetBridge = {
 
     const urlParams = {};
     if (urlParamsRefresh) urlParams.refresh = true;
+    // Pass actual theme to Superset — it natively supports dark/light.
     urlParams.theme = theme;
     if (languageCode && typeof languageCode === 'string') {
       urlParams.lang = languageCode;

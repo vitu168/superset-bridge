@@ -5,25 +5,16 @@ import 'superset_bridge_config.dart';
 ///
 /// ## How dark mode works
 ///
-/// Superset loads inside a cross-origin `<iframe>`.  The browser **blocks**:
-/// - `iframe.contentDocument` access (SecurityError)
-/// - CSS injection into the iframe's document
-/// - `embedDashboard().setThemeConfig()` — that method does not exist in any
-///   released version of `@superset-ui/embedded-sdk`
+/// The actual theme ('dark' or 'light') is passed to Superset via
+/// `urlParams.theme` in the `embedDashboard()` call. Newer Superset versions
+/// natively render the correct theme inside the iframe.
 ///
-/// The solution is a CSS visual filter applied to `#superset-mount` in the
-/// **parent** document (which we fully control):
+/// A `<meta name="color-scheme" content="light">` tag is included to prevent
+/// the OS `prefers-color-scheme: dark` from leaking through the WebView and
+/// overriding the explicitly requested theme.
 ///
-/// ```css
-/// body.dark #superset-mount { filter: invert(1) hue-rotate(180deg); }
-/// ```
-///
-/// - `invert(1)` flips pixel brightness (white ↔ black).
-/// - `hue-rotate(180deg)` spins hues so chart colours land roughly back where
-///   they started after the inversion.
-///
-/// `window.SupersetBridge.updateUI(theme)` toggles the body class instantly.
-/// For a full reload (theme + language + fresh token), use
+/// `window.SupersetBridge.updateUI(theme)` toggles the body background class.
+/// For a full theme switch (re-embed with new token + theme), use
 /// [SupersetBridgeController.reload] with a freshly generated HTML string.
 class SupersetBridgeHtmlContent {
   SupersetBridgeHtmlContent._();
@@ -53,6 +44,9 @@ class SupersetBridgeHtmlContent {
   <meta name="viewport" content="width=device-width, initial-scale=1.0,
         maximum-scale=1.0, user-scalable=no" />
   <title>Superset</title>
+  <!-- Match the color-scheme to the requested theme so that the browser
+       reports the correct prefers-color-scheme to the Superset iframe. -->
+  <meta name="color-scheme" content="$bodyClass" />
   <script src="https://unpkg.com/@superset-ui/embedded-sdk"></script>
   <style>
     /* ── Base layout ───────────────────────────────────── */
@@ -74,14 +68,9 @@ class SupersetBridgeHtmlContent {
 
     /* ── Light theme ───────────────────────────────────── */
     body.light { background: #f8fafc; }
-    body.light #superset-mount { filter: none; }
 
     /* ── Dark theme ────────────────────────────────────── */
-    /* Filter applied to mount div in PARENT doc — not cross-origin. */
     body.dark { background: #1e293b; }
-    body.dark #superset-mount { filter: invert(1) hue-rotate(180deg); }
-    /* Re-invert images so they are not colour-flipped. */
-    body.dark #superset-mount img { filter: invert(1) hue-rotate(180deg); }
   </style>
 </head>
 <body class="$bodyClass">
@@ -109,6 +98,9 @@ class SupersetBridgeHtmlContent {
       var token = await _sbGetToken();
       var urlParams = {};
       if (_sbUrlParamsRefresh) urlParams.refresh = true;
+      // Pass actual theme to Superset — it natively supports dark/light.
+      // The <meta name="color-scheme" content="light"> above prevents
+      // the OS prefers-color-scheme from overriding this value.
       urlParams.theme = _sbTheme;
       if (_sbSiteIds && _sbSiteIds.length > 0) urlParams.siteId = _sbSiteIds;
       if (_sbLanguageCode && typeof _sbLanguageCode === 'string') {

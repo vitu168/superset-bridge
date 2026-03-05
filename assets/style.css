@@ -35,28 +35,10 @@ html, body {
 body.light {
   background: #f8fafc;
 }
-body.light #superset-mount {
-  filter: none;
-}
 
 /* ── Dark theme ──────────────────────────────────────────────────────────── */
-/*
- * Applied to the mount <div> in the PARENT document — not cross-origin.
- * invert(1)          → flip brightness (white→black, black→white)
- * hue-rotate(180deg) → rotate hues so chart colours land roughly where they
- *                      started after the inversion.
- */
 body.dark {
-  /* background: #1e293b; */
-  /* background: #64748b; */
-  background: #2c364b;
-}
-body.dark #superset-mount {
-  filter: invert(1) hue-rotate(180deg);
-}
-/* Re-invert images so they are not colour-flipped. */
-body.dark #superset-mount img {
-  filter: invert(1) hue-rotate(180deg);
+  background: #1e293b;
 }
 
 /* ── Loading overlay ─────────────────────────────────────────────────────── */

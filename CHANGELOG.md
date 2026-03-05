@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.0
+
+- Fixed theme switch bug: meta color-scheme is now dynamic so dark ↔ light
+  transitions work correctly in WebView. Added explanation to docs.
+
+- **Breaking change**: Removed CSS `invert(1) hue-rotate(180deg)` filter hack
+  for dark mode. Newer Superset versions natively support dark/light themes via
+  `urlParams.theme`. The actual Flutter theme is now passed directly to
+  Superset's `embedDashboard()` call. The body CSS class is only used for
+  background colour styling.
+
 ## 1.4.0
 
 _ Added `languageCode` parameter to `SupersetBridgeConfig` and related APIs;
