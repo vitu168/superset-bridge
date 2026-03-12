@@ -1,25 +1,12 @@
 import 'dart:convert';
 import 'superset_bridge_config.dart';
-
-/// Generates the self-contained HTML string for embedding a Superset dashboard.
-///
-/// ## How dark mode works
-///
-/// The actual theme ('dark' or 'light') is passed to Superset via
-/// `urlParams.theme` in the `embedDashboard()` call. Newer Superset versions
-/// natively render the correct theme inside the iframe.
-///
-/// A `<meta name="color-scheme" content="light">` tag is included to prevent
-/// the OS `prefers-color-scheme: dark` from leaking through the WebView and
-/// overriding the explicitly requested theme.
-///
-/// `window.SupersetBridge.updateUI(theme)` toggles the body background class.
-/// For a full theme switch (re-embed with new token + theme), use
-/// [SupersetBridgeController.reload] with a freshly generated HTML string.
 class SupersetBridgeHtmlContent {
   SupersetBridgeHtmlContent._();
   static String generate(SupersetBridgeConfig config) {
     final baseUrlJs          = jsonEncode(config.domain);
+    final tokenBaseUrlJs     = jsonEncode(config.tokenBaseURL.isNotEmpty
+        ? config.tokenBaseURL
+        : config.domain);
     final dashboardIdJs      = jsonEncode(config.dashboardId);
     final themeJs            = jsonEncode(config.theme);
     final siteIdsJs          = (config.siteIds != null && config.siteIds!.isNotEmpty)
@@ -77,6 +64,7 @@ class SupersetBridgeHtmlContent {
   <div id="superset-mount"></div>
   <script>
     var _sbDomain           = $baseUrlJs;
+    var _sbTokenBaseURL     = $tokenBaseUrlJs;
     var _sbUUID             = $dashboardIdJs;
     var _sbTheme            = $themeJs;
     var _sbSiteIds          = $siteIdsJs;
@@ -88,7 +76,7 @@ class SupersetBridgeHtmlContent {
     var _sbDashboard        = null;
 
     async function _sbGetToken() {
-      var resp = await fetch(_sbDomain + '/guest-token?dashboard_id=' + _sbUUID);
+      var resp = await fetch(_sbTokenBaseURL + '/guest-token?dashboard_id=' + _sbUUID);
       if (!resp.ok) throw new Error('Token fetch HTTP ' + resp.status);
       var data = await resp.json();
       return data.token;
@@ -115,7 +103,9 @@ class SupersetBridgeHtmlContent {
         id: _sbUUID,
         supersetDomain: _sbDomain,
         mountPoint: document.getElementById('superset-mount'),
-        fetchGuestToken: function() { return Promise.resolve(token); },
+        fetchGuestToken: function() { 
+        return Promise.resolve(token); 
+        },
         dashboardUiConfig: {
           hideTitle: _sbHideTitle,
           standalone: true,

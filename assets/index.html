@@ -5,56 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0,
         maximum-scale=1.0, user-scalable=no" />
   <title>Superset Dashboard</title>
-  <!-- Force light color-scheme to prevent prefers-color-scheme:dark leaking -->
   <meta name="color-scheme" content="light" />
-  <!--
-    Standalone web-server shell for the Superset Bridge library.
-    This file is NOT loaded by Flutter — it is a reference for deploying
-    the bridge on a static web server (nginx, S3, etc.).
-
-    Flutter uses SupersetBridgeHtmlContent.generate() instead which
-    inlines everything into a single HTML string loaded via loadData().
-
-    Usage on a web server:
-      1.  Set SUPERSET_DOMAIN and DASHBOARD_UUID in the <script> below.
-      2.  Set the initial theme class on <body> ('light' or 'dark').
-      3.  Serve this folder at any path.
-  -->
-
-  <!-- Superset Embedded SDK (render-blocking — SDK is ready when body runs) -->
   <script src="https://unpkg.com/@superset-ui/embedded-sdk"></script>
 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="light">
-
-  <!-- Mount point: Superset iframe is injected here -->
   <div id="superset-mount"></div>
-
-  <!-- Loading overlay (shown while fetching token + embedding) -->
   <div id="_bridge_loading">Loading dashboard…</div>
-
-  <!-- Error overlay (shown on token fetch or embed failure) -->
   <div id="_bridge_error"></div>
-
-  <!-- Bridge library -->
   <script src="bridge.js"></script>
-
-  <!-- Bootstrap: set your values here -->
   <script>
-    var SUPERSET_DOMAIN = 'https://superset.example.com'; // ← change me
-    var DASHBOARD_UUID  = 'your-dashboard-uuid';          // ← change me
+    var SUPERSET_DOMAIN = 'https://superset.example.com';
+    var DASHBOARD_UUID  = 'your-dashboard-uuid';         
     var THEME           = document.body.classList.contains('dark') ? 'dark' : 'light';
-    var SITE_IDS        = null; // or [1, 2, 3]
+    var SITE_IDS        = null;
 
     SupersetBridge.initWithTokenFetch(
       DASHBOARD_UUID,
       SUPERSET_DOMAIN,
       THEME,
       SITE_IDS,
-      true,  // hideTitle
-      false, // filtersExpanded
-      true   // urlParamsRefresh
+      true,
+      false,
+      true
     );
   </script>
 
